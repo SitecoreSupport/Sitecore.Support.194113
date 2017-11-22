@@ -28,14 +28,14 @@ namespace Sitecore.Support.ContentTesting.Pipelines.GetScreenShotForURL
         var siteInfoList = Sitecore.Configuration.Factory.GetSiteInfoList();
         foreach (SiteInfo siteInf in siteInfoList)
         {
-          if (!String.IsNullOrEmpty(siteInf.RootPath) && !String.IsNullOrEmpty(siteInf.StartItem) && item.Paths.FullPath.StartsWith(siteInf.RootPath + siteInf.StartItem))
+          if (!String.IsNullOrEmpty(siteInf.RootPath) && !String.IsNullOrEmpty(siteInf.StartItem) && IsNeededSite(item.Paths.FullPath, siteInf.RootPath + siteInf.StartItem))
           {
+            if (String.IsNullOrEmpty(siteInf.Scheme) || String.IsNullOrEmpty(siteInf.TargetHostName)) continue;
             Sitecore.Context.Site = Sitecore.Sites.SiteContext.GetSite(siteInf.Name);
-
             args.Url = String.Format("{0}://{1}", siteInf.Scheme, siteInf.TargetHostName) + urlString.GetUrl();
           }
         }
-
+        if (String.IsNullOrEmpty(args.Url)) args.Url = Sitecore.Web.WebUtil.GetServerUrl() + urlString.GetUrl();
       }
 
       else
@@ -46,6 +46,17 @@ namespace Sitecore.Support.ContentTesting.Pipelines.GetScreenShotForURL
 
         args.Url = Sitecore.Web.WebUtil.GetServerUrl() + urlString.GetUrl();
       }
+    }
+    private bool IsNeededSite(string itemPath, string sitePath)
+    {
+      string[] itemPathArr = itemPath.Replace("//","/").Split('/');
+      string[] sitePathArr = sitePath.Replace("//","/").Split('/');
+
+      for (int i = 0; i < sitePathArr.Length; i++)
+      {
+        if (itemPathArr[i] != sitePathArr[i]) return false;
+      }
+      return true;
     }
   }
 }
