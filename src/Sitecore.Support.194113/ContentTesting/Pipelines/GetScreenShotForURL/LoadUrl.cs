@@ -54,7 +54,7 @@ namespace Sitecore.Support.ContentTesting.Pipelines.GetScreenShotForURL
 
       for (int i = 0; i < sitePathArr.Length; i++)
       {
-        if (itemPathArr[i] != sitePathArr[i]) return false;
+        if (itemPathArr[i].ToLowerInvariant() != sitePathArr[i].ToLowerInvariant()) return false;
       }
       return true;
     }
